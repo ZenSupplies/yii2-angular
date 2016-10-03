@@ -143,25 +143,27 @@ class NgView extends Widget
                 $view->registerJs($js, WebView::POS_END);
             }
         }
-        // Asset Dependency
-        $key = md5(Yii::$app->controller->route . $this->name);
-        $bundle = [
-            'baseUrl' => '',
-            'depends' => [AngularAsset::className()],
-            'js' => [],
-        ];
-        foreach ($this->requires as $module) {
-            if (isset(static::$requireAssets[$module])) {
-                $bundle['depends'][] = static::$requireAssets[$module];
-            }
-        }
-        if ($this->remote) {
+	// Asset Dependency
+        if (Yii::$app->getAssetManager()->bundles !== false) {
             $key = md5(Yii::$app->controller->route . $this->name);
-            $url = Url::current([$this->queryParam => 'script']);
-            $bundle['js'][] = strncmp($url, '//', 2) === 0 ? $url : ltrim($url, '/');
+            $bundle = [
+                'baseUrl' => '',
+                'depends' => [AngularAsset::className()],
+                'js' => [],
+            ];
+            foreach ($this->requires as $module) {
+                if (isset(static::$requireAssets[$module])) {
+                    $bundle['depends'][] = static::$requireAssets[$module];
+                }
+            }
+            if ($this->remote) {
+                $key = md5(Yii::$app->controller->route . $this->name);
+                $url = Url::current([$this->queryParam => 'script']);
+                $bundle['js'][] = strncmp($url, '//', 2) === 0 ? $url : ltrim($url, '/');
+            }
+            Yii::$app->getAssetManager()->bundles[$key] = new AssetBundle($bundle);
+            $view->registerAssetBundle($key);
         }
-        Yii::$app->getAssetManager()->bundles[$key] = new AssetBundle($bundle);
-        $view->registerAssetBundle($key);
 
         static::$instance = null;
         return Html::tag($this->tag, '', ['ng-app' => $this->useNgApp ? $this->name : false, 'ng-view' => $this->tag != 'ng-view']);
