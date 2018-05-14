@@ -30,7 +30,6 @@
         "bootstrap": "dee\\angular\\Bootstrap",
         "branch-alias": {
             "dev-master": "1.x-dev",
-            "dev-zen": "1.4.x-dev",
             "dev-zen-1.5": "1.5.x-dev"
         }
     }
