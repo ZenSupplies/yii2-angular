@@ -98,6 +98,8 @@ class NgView extends Widget
         'ngAnimate'    => 'dee\angular\AngularAnimateAsset',
         'ngAria'       => 'dee\angular\AngularAnimateAsset',
         'ngTouch'      => 'dee\angular\AngularAnimateAsset',
+        'validation'   => 'dee\angular\AngularValidationAsset',
+        'validation.rule' => 'dee\angular\AngularValidationAsset',
     ];
     private $_varName;
 
