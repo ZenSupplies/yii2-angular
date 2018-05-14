@@ -3,19 +3,19 @@
 namespace dee\angular;
 
 use Yii;
-use yii\helpers\Html;
-use yii\helpers\ArrayHelper;
-use yii\helpers\Json;
-use yii\helpers\Inflector;
-use yii\web\View as WebView;
 use yii\base\Widget;
+use yii\helpers\ArrayHelper;
+use yii\helpers\Html;
+use yii\helpers\Inflector;
+use yii\helpers\Json;
 use yii\helpers\Url;
 use yii\web\AssetBundle;
+use yii\web\View as WebView;
 
 /**
  * Description of NgView
  *
- * 
+ *
  * @author Misbahul D Munir <misbahuldmunir@gmail.com>
  * @since 1.0
  */
@@ -72,7 +72,7 @@ class NgView extends Widget
     public $clientOptions;
 
     /**
-     * @var array 
+     * @var array
      */
     public $injection = ['$scope', '$injector'];
 
@@ -82,7 +82,7 @@ class NgView extends Widget
     public $remote;
 
     /**
-     * @var string 
+     * @var string
      */
     public $queryParam = '_ng-view';
 
@@ -91,21 +91,19 @@ class NgView extends Widget
      */
     public static $requireAssets = [
         'ui.bootstrap' => 'dee\angular\AngularBootstrapAsset',
-        'dee.ui' => 'dee\angular\DeeAngularUiAsset',
-        'dee.rest' => 'dee\angular\DeeAngularRestAsset',
-        'ngRoute' => 'dee\angular\AngularRouteAsset',
-        'ngResource' => 'dee\angular\AngularResourceAsset',
-        'ngAnimate' => 'dee\angular\AngularAnimateAsset',
-        'ngAria' => 'dee\angular\AngularAnimateAsset',
-        'ngTouch' => 'dee\angular\AngularAnimateAsset',
-        'validation' => 'dee\angular\AngularValidationAsset',
-        'validation.rule' => 'dee\angular\AngularValidationAsset',
+        'dee.ui'       => 'dee\angular\DeeAngularUiAsset',
+        'dee.rest'     => 'dee\angular\DeeAngularRestAsset',
+        'ngRoute'      => 'dee\angular\AngularRouteAsset',
+        'ngResource'   => 'dee\angular\AngularResourceAsset',
+        'ngAnimate'    => 'dee\angular\AngularAnimateAsset',
+        'ngAria'       => 'dee\angular\AngularAnimateAsset',
+        'ngTouch'      => 'dee\angular\AngularAnimateAsset',
     ];
     private $_varName;
 
     /**
      *
-     * @var static 
+     * @var static
      */
     public static $instance;
 
@@ -143,13 +141,13 @@ class NgView extends Widget
                 $view->registerJs($js, WebView::POS_END);
             }
         }
-	// Asset Dependency
+        // Asset Dependency
         if (Yii::$app->getAssetManager()->bundles !== false) {
             $key = md5(Yii::$app->controller->route . $this->name);
             $bundle = [
                 'baseUrl' => '',
                 'depends' => [AngularAsset::className()],
-                'js' => [],
+                'js'      => [],
             ];
             foreach ($this->requires as $module) {
                 if (isset(static::$requireAssets[$module])) {
@@ -166,6 +164,7 @@ class NgView extends Widget
         }
 
         static::$instance = null;
+
         return Html::tag($this->tag, '', ['ng-app' => $this->useNgApp ? $this->name : false, 'ng-view' => $this->tag != 'ng-view']);
     }
 
@@ -202,7 +201,7 @@ class NgView extends Widget
         $js[] = $this->renderControllers($controllers);
         $js[] = $this->renderResources();
         if ($this->js !== null) {
-            foreach ((array) $this->js as $file) {
+            foreach ((array)$this->js as $file) {
                 $js[] = "\n" . static::parseBlockJs($view->render($file));
             }
         }
@@ -249,6 +248,7 @@ class NgView extends Widget
             $routeProvider = "module.templates[{$path}]";
         }
         $this->controller = null;
+
         return [$routeProvider, $controller, $template];
     }
 
@@ -262,6 +262,7 @@ class NgView extends Widget
     {
         $js = "var module = angular.module('{$this->name}'," . Json::htmlEncode($this->requires) . ");\n"
             . "var {$this->_varName} = module;";
+
         return $js;
     }
 
@@ -272,11 +273,13 @@ class NgView extends Widget
 
     /**
      * Render script config for $routeProvider
+     *
      * @param array $routeProviders
      */
     protected function renderRouteProviders($routeProviders)
     {
         $routeProviders = implode("\n", $routeProviders);
+
         return "module.config(['\$routeProvider',function(\$routeProvider){\n{$routeProviders}\n}]);";
     }
 
@@ -288,6 +291,7 @@ class NgView extends Widget
      *         ...
      *     }]);
      * ```
+     *
      * @param array $controllers
      */
     protected function renderControllers($controllers)
@@ -295,12 +299,13 @@ class NgView extends Widget
         $js = [];
         $view = $this->getView();
         foreach ($controllers as $name => $injection) {
-            $injection = array_unique(array_merge($this->injection, (array) $injection));
+            $injection = array_unique(array_merge($this->injection, (array)$injection));
             $injectionStr = rtrim(Json::htmlEncode($injection), ']');
             $injectionVar = implode(", ", $injection);
             $function = implode("\n", ArrayHelper::getValue($view->js, $name, []));
             $js[] = "module.controller('$name',{$injectionStr},\nfunction($injectionVar){\n{$function}\n}]);";
         }
+
         return implode("\n", $js);
     }
 
@@ -335,14 +340,18 @@ module.factory('$name',['\$resource',function(\$resource){
 }]);
 JS;
             }
+
             return implode("\n", $js);
         }
+
         return '';
     }
 
     /**
      * Only get script inner of `script` tag.
+     *
      * @param string $js
+     *
      * @return string
      */
     public static function parseBlockJs($js)
@@ -351,12 +360,13 @@ JS;
         if (preg_match($jsBlockPattern, trim($js), $matches)) {
             $js = trim($matches['block_content']);
         }
+
         return $js;
     }
 
     /**
      * Register script to controller.
-     * 
+     *
      * @param string $viewFile
      * @param array $params
      * @param integer|string $pos
@@ -376,7 +386,7 @@ JS;
      */
     public function registerJs($js, $pos = null)
     {
-        $pos = $pos ? : ($this->controller ? : WebView::POS_END);
+        $pos = $pos ?: ($this->controller ?: WebView::POS_END);
         $this->view->registerJs(static::parseBlockJs($js), $pos);
     }
 }
